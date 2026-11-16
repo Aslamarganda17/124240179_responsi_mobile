@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'root.dart';
 
-// NIM: 124240179 (Aslam Arganda)
 const String kNim = '124240179';
 const String kPassword = '123';
 
@@ -23,7 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text.trim();
 
     if (username == kNim && password == kPassword) {
-      // simpan session ke SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('loginData', true);
       await prefs.setString('username', username);
@@ -81,7 +79,15 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.movie, size: 72, color: Color(0xFFF44336)),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.asset(
+                  'assets/images/logo.png',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.cover,
+                ),
+              ),
               const SizedBox(height: 12),
               const Text(
                 'NontonSkuy!',

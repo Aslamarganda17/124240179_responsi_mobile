@@ -18,13 +18,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUsername();
   }
 
-  // ambil username dari SharedPreferences
   void _loadUsername() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() => username = prefs.getString('username') ?? '-');
   }
 
-  // hapus session lalu kembali ke login (stack dibersihkan)
   void _logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('loginData');

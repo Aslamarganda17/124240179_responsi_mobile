@@ -14,7 +14,7 @@ void main() async {
   Hive.registerAdapter(FavoriteShowAdapter());
   await Hive.openBox<FavoriteShow>('favorites');
 
-  // SharedPreferences (session login)
+  // (session login)
   final prefs = await SharedPreferences.getInstance();
   final isLogin = prefs.getBool('loginData') ?? false;
 
