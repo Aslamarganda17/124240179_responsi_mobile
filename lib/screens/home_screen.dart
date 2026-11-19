@@ -22,11 +22,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     try {
       final data = await ApiService.getShows();
+      if (!mounted) return;
       setState(() {
         shows = data;
         isLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
+      if (!mounted) return;
       setState(() {
         errorMessage = 'Gagal memuat data. Cek koneksi internet.';
         isLoading = false;
@@ -51,7 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Text(errorMessage!),
             const SizedBox(height: 12),
-            ElevatedButton(onPressed: fetchShows, child: const Text('Coba lagi')),
+            ElevatedButton(
+                onPressed: fetchShows, child: const Text('Coba lagi')),
           ],
         ),
       );
@@ -89,9 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: SizedBox(
                     width: double.infinity,
-                    child: show.imageMedium != null
+                    child: show.posterImage != null
                         ? Image.network(
-                            show.imageMedium!,
+                            show.posterImage!,
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => const Icon(
                               Icons.broken_image,
@@ -108,7 +111,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Text(
                         show.name,
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -119,10 +122,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         children: [
                           const Icon(Icons.star, color: Colors.amber, size: 14),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 3),
+                          Text(show.rating?.toStringAsFixed(1) ?? '-',
+                              style: const TextStyle(fontSize: 12)),
+                          const Spacer(),
                           Text(
-                            show.rating?.toString() ?? '-',
-                            style: const TextStyle(fontSize: 12),
+                            show.ageRating ?? 'NR',
+                            style: const TextStyle(
+                              color: Colors.white60,
+                              fontSize: 11,
+                            ),
                           ),
                         ],
                       ),
@@ -142,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Skuy Nonton!',
+          'Keripikroll',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),

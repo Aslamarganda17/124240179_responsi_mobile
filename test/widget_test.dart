@@ -16,7 +16,7 @@ void main() {
   ) async {
     await tester.pumpWidget(const MainApp(isLogin: false));
 
-    expect(find.text('NontonSkuy!'), findsOneWidget);
+    expect(find.text('Keripikroll'), findsOneWidget);
     expect(find.byType(TextField), findsNWidgets(2));
     expect(find.widgetWithText(ElevatedButton, 'Login'), findsOneWidget);
   });

@@ -12,6 +12,7 @@ void main() async {
   // Hive (favorit)
   await Hive.initFlutter();
   Hive.registerAdapter(FavoriteShowAdapter());
+
   await Hive.openBox<FavoriteShow>('favorites');
 
   // (session login)
@@ -28,13 +29,13 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'NontonSkuy!',
+      title: 'Keripikroll',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: Colors.black,
         colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFF44336),
+          primary: Color(0xFFFF5722),
           surface: Color(0xFF1C1C1E),
         ),
         appBarTheme: const AppBarTheme(
@@ -44,7 +45,7 @@ class MainApp extends StatelessWidget {
         ),
         bottomNavigationBarTheme: const BottomNavigationBarThemeData(
           backgroundColor: Colors.black,
-          selectedItemColor: Color(0xFFF44336),
+          selectedItemColor: Color(0xFFFF5722),
           unselectedItemColor: Colors.grey,
         ),
       ),

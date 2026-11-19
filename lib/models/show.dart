@@ -1,46 +1,65 @@
 class Show {
   final int id;
   final String name;
-  final String? imageMedium;
-  final String? imageOriginal;
+  final String? posterImage;
+  final String? coverImage;
   final double? rating;
-  final List<String> genres;
-  final String summary;
+  final String? ageRating;
+  final int? episodeCount;
+  final String synopsis;
 
-  Show({
+  const Show({
     required this.id,
     required this.name,
-    this.imageMedium,
-    this.imageOriginal,
+    this.posterImage,
+    this.coverImage,
     this.rating,
-    required this.genres,
-    required this.summary,
+    this.ageRating,
+    this.episodeCount,
+    required this.synopsis,
   });
 
-  // factory constructor (Modul 5 bagian G)
   factory Show.fromJson(Map<String, dynamic> json) {
-    final image = json['image'] as Map<String, dynamic>?;
-    final ratingMap = json['rating'] as Map<String, dynamic>?;
+    final attributes = json['attributes'] as Map<String, dynamic>? ?? const {};
+    final titles = attributes['titles'] as Map<String, dynamic>? ?? const {};
+    final poster =
+        attributes['posterImage'] as Map<String, dynamic>? ?? const {};
+    final cover = attributes['coverImage'] as Map<String, dynamic>? ?? const {};
+    final averageRating = _number(attributes['averageRating']);
+    final id = int.tryParse(json['id'].toString());
+
+    if (id == null) {
+      throw const FormatException('ID anime Kitsu tidak valid.');
+    }
 
     return Show(
-      id: json['id'],
-      name: json['name'] ?? '-',
-      imageMedium: image?['medium'],
-      imageOriginal: image?['original'],
-      rating: (ratingMap?['average'] as num?)?.toDouble(),
-      genres: List<String>.from(json['genres'] ?? []),
-      summary: _stripHtml(json['summary'] ?? ''),
+      id: id,
+      name: (titles['en_jp'] ??
+              titles['en'] ??
+              attributes['canonicalTitle'] ??
+              attributes['slug'] ??
+              'Tanpa judul')
+          .toString(),
+      posterImage: poster['medium']?.toString() ??
+          poster['small']?.toString() ??
+          poster['tiny']?.toString(),
+      coverImage: cover['large']?.toString() ??
+          cover['small']?.toString() ??
+          cover['tiny']?.toString(),
+      rating: averageRating == null ? null : averageRating / 10,
+      ageRating: attributes['ageRating']?.toString(),
+      episodeCount: _integer(attributes['episodeCount']),
+      synopsis: attributes['synopsis']?.toString().trim() ?? '',
     );
   }
 
-  // summary dari TVMaze berupa HTML (<p>, <b>, dst), kita bersihkan
-  static String _stripHtml(String html) {
-    return html
-        .replaceAll(RegExp(r'<[^>]*>'), '')
-        .replaceAll('&amp;', '&')
-        .replaceAll('&quot;', '"')
-        .replaceAll('&#39;', "'")
-        .replaceAll('&nbsp;', ' ')
-        .trim();
+  static double? _number(Object? value) {
+    if (value is num) return value.toDouble();
+    return value == null ? null : double.tryParse(value.toString());
+  }
+
+  static int? _integer(Object? value) {
+    if (value is int) return value;
+    return value == null ? null : int.tryParse(value.toString());
   }
 }

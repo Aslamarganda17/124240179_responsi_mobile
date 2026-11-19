@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'root.dart';
 
-const String kNim = '124240179';
-const String kPassword = '123';
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -16,27 +13,44 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool isLoginFailed = false;
+  bool isSubmitting = false;
 
-  void _login() async {
+  Future<void> _login() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (username == kNim && password == kPassword) {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('loginData', true);
-      await prefs.setString('username', username);
+    if (username.isEmpty || password.isEmpty) {
+      setState(() => isLoginFailed = true);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Username dan password wajib diisi.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const Root()),
-        );
-      }
+    setState(() {
+      isSubmitting = true;
+      isLoginFailed = false;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final usernameSaved = await prefs.setString('username', username);
+    final loginSaved = usernameSaved && await prefs.setBool('loginData', true);
+
+    if (!mounted) return;
+    setState(() => isSubmitting = false);
+    if (loginSaved) {
+      FocusScope.of(context).unfocus();
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Root()),
+      );
     } else {
       setState(() => isLoginFailed = true);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Login gagal: Username atau Password salah'),
+          content: Text('Data login gagal disimpan. Coba lagi.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -90,25 +104,27 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 12),
               const Text(
-                'NontonSkuy!',
+                'Keripikroll',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 32),
               TextField(
                 controller: _usernameController,
+                onChanged: (_) => setState(() => isLoginFailed = false),
                 decoration: _decoration('Username', Icons.person),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _passwordController,
                 obscureText: true,
+                onChanged: (_) => setState(() => isLoginFailed = false),
                 decoration: _decoration('Password', Icons.lock),
               ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _login,
+                  onPressed: isSubmitting ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF44336),
                     foregroundColor: Colors.white,
@@ -117,7 +133,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  child: const Text('Login', style: TextStyle(fontSize: 16)),
+                  child: isSubmitting
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Login', style: TextStyle(fontSize: 16)),
                 ),
               ),
             ],

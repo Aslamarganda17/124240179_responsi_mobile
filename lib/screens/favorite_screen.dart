@@ -13,7 +13,7 @@ class FavoriteScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Daftar Favorit',
+          'Favorit',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
@@ -60,13 +60,14 @@ class FavoriteScreen extends StatelessWidget {
                   ),
                   title: Text(
                     fav.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14),
                   ),
                   subtitle: Row(
                     children: [
                       const Icon(Icons.star, color: Colors.amber, size: 14),
                       const SizedBox(width: 4),
-                      Text(fav.rating?.toString() ?? '-'),
+                      Text(fav.rating?.toStringAsFixed(1) ?? '-'),
                     ],
                   ),
                   trailing: IconButton(

@@ -1,29 +1,42 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../models/show.dart';
 
-/// Semua urusan fetch & parse API dipisah dari UI di sini.
 class ApiService {
-  static const String apiUrl = 'https://api.tvmaze.com/shows';
+  static const String _baseUrl = 'https://kitsu.io/api/edge/anime';
+  static const Map<String, String> _headers = {
+    'Accept': 'application/vnd.api+json',
+  };
 
-  // GET https://api.tvmaze.com/shows
   static Future<List<Show>> getShows() async {
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      final List data = jsonDecode(response.body);
-      return data.map((e) => Show.fromJson(e)).toList();
-    } else {
-      throw Exception('Failed to load shows');
+    final uri = Uri.https('kitsu.io', '/api/edge/anime', {
+      'page[limit]': '20',
+      'page[offset]': '0',
+    });
+    final response = await http.get(uri, headers: _headers);
+    if (response.statusCode != 200) {
+      throw Exception('Gagal memuat daftar anime (${response.statusCode}).');
     }
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final data = body['data'] as List<dynamic>;
+    return data
+        .map((item) => Show.fromJson(item as Map<String, dynamic>))
+        .toList();
   }
 
-  // GET https://api.tvmaze.com/shows/{id}
   static Future<Show> getSingleShow(int id) async {
-    final response = await http.get(Uri.parse('$apiUrl/$id'));
-    if (response.statusCode == 200) {
-      return Show.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to load show detail');
+    final response = await http.get(
+      Uri.parse('$_baseUrl/$id'),
+      headers: _headers,
+    );
+    if (response.statusCode != 200) {
+      throw Exception('Gagal memuat detail anime (${response.statusCode}).');
     }
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    return Show.fromJson(body['data'] as Map<String, dynamic>);
   }
 }

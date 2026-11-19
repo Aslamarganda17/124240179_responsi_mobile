@@ -1,8 +1,5 @@
 import 'package:hive/hive.dart';
 
-/// Model yang disimpan di Hive.
-/// Adapter ditulis manual (hasilnya sama dengan yang digenerate build_runner),
-/// jadi TIDAK perlu menjalankan `dart run build_runner build`.
 class FavoriteShow {
   final int id;
   final String name;

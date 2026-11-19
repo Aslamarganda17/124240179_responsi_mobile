@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/favorite_show.dart';
 import 'login_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -20,6 +23,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _loadUsername() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     setState(() => username = prefs.getString('username') ?? '-');
   }
 
@@ -55,26 +59,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Icon(Icons.person, size: 48, color: Colors.white70),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Aslam Arganda',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 4),
               Text(
                 username,
-                style: const TextStyle(fontSize: 13, color: Colors.grey),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              const SizedBox(height: 12),
-              const Text(
-                'Kesan: Sangat Menyenangkan, Mobile seruh walaupun saya yang masih bodoh',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Pesan: Makasih mas Umar dan mas Zaki , semangat mas!',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 12),
+              const SizedBox(height: 8),
+              ValueListenableBuilder(
+                valueListenable:
+                    Hive.box<FavoriteShow>('favorites').listenable(),
+                builder: (context, Box<FavoriteShow> box, _) => Text(
+                  'Anime disukai: ${box.length}',
+                  style: const TextStyle(color: Colors.grey, fontSize: 14),
+                ),
               ),
               const SizedBox(height: 32),
               SizedBox(
@@ -82,7 +81,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: ElevatedButton(
                   onPressed: _logout,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF44336),
+                    backgroundColor: const Color(0xFFFF5722),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
